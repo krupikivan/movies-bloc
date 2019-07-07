@@ -7,8 +7,8 @@ class MoviesBloc {
 
   Observable<ItemModel> get movies => _moviesFetcher.stream;
 
-  fetchMovies(id) async {
-    ItemModel itemModel = await _repository.fetchMovies(id);
+  fetchMovies() async {
+    ItemModel itemModel = await _repository.fetchPopularMovies();
     _moviesFetcher.sink.add(itemModel);
   }
 

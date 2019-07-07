@@ -1,18 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_movies/src/bloc/favourite_page.dart';
-import 'package:flutter_movies/src/bloc/navbar_bloc.dart';
+import 'package:flutter_movies/src/bloc/navbar/navbar_bloc.dart';
+import 'package:flutter_movies/src/bloc/popup_bloc.dart';
+import 'package:flutter_movies/src/bloc/popup_event.dart';
+import 'package:flutter_movies/src/model/filter.dart';
 import 'package:flutter_movies/src/ui/popular_movie_list.dart';
 
 
-class Filter{
-  final Text title;
-  final int id;
-  const Filter({this.title, this.id});
-}
-const List<Filter> filter = <Filter> [
-  const Filter(title: const Text('Mas populares'), id: 0),
-  const Filter(title: const Text('Mas valoradas'), id: 1),
-];
 
 class HomePage extends StatefulWidget {
 
@@ -26,11 +20,11 @@ class HomePageState extends State<HomePage> {
 
   NavbarBloc _navbarBloc;
   Filter _selectedFilter = filter[0];
+  final _popupBloc = PopupBloc();
 
   void _selectedFilterMenu(Filter filter){
-    setState(() {
-      _selectedFilter = filter;
-    });
+    if (filter.id == 0) _popupBloc.popupEventSink.add(PopularEvent());
+    else _popupBloc.popupEventSink.add(TopRatedEvent());
   }
 
   @override
@@ -55,26 +49,32 @@ class HomePageState extends State<HomePage> {
         builder: (BuildContext context, AsyncSnapshot<NavbarItem> snapshot) {
           switch (snapshot.data) {
             case NavbarItem.INICIO:
-              return Scaffold(
-                  appBar: AppBar(
-                    title: Text(_selectedFilter.title.data),
-                    actions: <Widget>[
-                      new PopupMenuButton(
-                          itemBuilder: (BuildContext context){
-                            return filter.map((Filter filter){
-                              return new PopupMenuItem(
-                                value: filter,
-                                child: new ListTile(
-                                  title: filter.title,
-                                ),
-                              );
-                            }).toList();
-                          },
-                        onSelected: _selectedFilterMenu,
-                      )
-                    ],
-                  ),
-                  body: new PopularPage(id: _selectedFilter.id)
+              return StreamBuilder<Filter>(
+                stream: _popupBloc.popupItem,
+                initialData: _selectedFilter,
+                builder: (context, AsyncSnapshot<Filter> snapFilter) {
+                  return Scaffold(
+                      appBar: AppBar(
+                        title: Text(snapFilter.data.title.data),
+                        actions: <Widget>[
+                          new PopupMenuButton(
+                              itemBuilder: (BuildContext context){
+                                return filter.map((Filter filter){
+                                  return new PopupMenuItem(
+                                    value: filter,
+                                    child: new ListTile(
+                                      title: filter.title,
+                                    ),
+                                  );
+                                }).toList();
+                              },
+                            onSelected: _selectedFilterMenu,
+                          )
+                        ],
+                      ),
+                      body: PopularPage()
+                  );
+                }
               );
             case NavbarItem.FAVORITOS:
               return Scaffold(
