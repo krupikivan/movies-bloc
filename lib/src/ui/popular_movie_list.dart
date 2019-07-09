@@ -11,7 +11,7 @@ class PopularPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final _movieBloc = MovieProvider.of(context);
-    return StreamBuilder(
+    return StreamBuilder<ItemModel>(
       stream: _movieBloc.outputMovies,
       builder: (BuildContext context, AsyncSnapshot<ItemModel> snapshot) {
         if (!snapshot.hasData) {
@@ -31,9 +31,12 @@ class PopularPage extends StatelessWidget {
         return StaggeredGridView.countBuilder(
           crossAxisCount: 4,
           itemCount: 20,
-          itemBuilder: (context, index) => MovieBuilder(index: index, itemModel: snapshot.data),
-          staggeredTileBuilder: (int index) =>
-          new StaggeredTile.count(2, 3),
+          itemBuilder: (context, index) =>
+              MovieBuilder(
+                  index: index,
+                  itemModel: snapshot.data
+              ),
+          staggeredTileBuilder: (int index) => new StaggeredTile.count(2, 3),
         );
       },
     );

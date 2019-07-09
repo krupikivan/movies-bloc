@@ -20,7 +20,7 @@ class MovieBuilder extends StatelessWidget {
       index != -1?
           InkWell(
             enableFeedback: true,
-            onTap: () => openDetailPage(itemModel, index),
+            onTap: () => openDetailPage(itemModel, index, context),
             child: Stack(
               children: <Widget>[
                 new Positioned(
@@ -49,7 +49,7 @@ class MovieBuilder extends StatelessWidget {
     );
   }
 
-  openDetailPage(ItemModel data, int index) {
+  openDetailPage(ItemModel data, int index, BuildContext context) {
     final page = MovieDetailProvider(
       child: MovieDetail(
         title: data.results[index].title,

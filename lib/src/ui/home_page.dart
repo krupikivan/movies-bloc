@@ -18,7 +18,6 @@ class HomePage extends StatefulWidget {
 class HomePageState extends State<HomePage> {
 
   NavbarBloc _navbarBloc;
-  Filter _selectedFilter = filter[0];
 
   @override
   void initState() {
@@ -33,9 +32,11 @@ class HomePageState extends State<HomePage> {
   }
 
 
+  Filter _selectedFilter = filter[0];
   @override
   Widget build(BuildContext context) {
     final _movieBloc = MovieProvider.of(context);
+    //final _navbarBloc = NavBarProvider.of(context);
     return Scaffold(
       body: StreamBuilder<NavbarItem>(
         stream: _navbarBloc.itemStream,

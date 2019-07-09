@@ -57,7 +57,6 @@ class MovieBloc {
       inputMovies.add(itemModel);
     } else {
       ItemModel itemModel = await repo.fetchTopRatedMovieList();
-      print("trajo las top!");
       inputMovies.add(itemModel);
     }
   }

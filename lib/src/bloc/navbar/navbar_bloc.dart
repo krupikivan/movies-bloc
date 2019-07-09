@@ -1,9 +1,10 @@
 import 'dart:async';
 
+
 enum NavbarItem { INICIO, FAVORITOS}
 
 
-class NavbarBloc {
+class NavbarBloc{
   final StreamController<NavbarItem> _navBarController =
       StreamController<NavbarItem>.broadcast();
 
