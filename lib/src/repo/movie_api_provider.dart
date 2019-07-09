@@ -5,12 +5,11 @@ import 'package:flutter_movies/src/model/trailer_model.dart';
 import 'package:http/http.dart' show Client;
 
 class MovieApiProvider {
-  Client client = Client();
-  final _apiKey = '883f4e3915ab44847949954a07a67ac2';
-  final _baseUrl = "http://api.themoviedb.org/3/movie";
+  Client _client = Client();
+  static const String _baseUrl = "http://api.themoviedb.org/3/movie";
 
   Future<ItemModel> fetchPopularMovieList() async {
-    final response = await client.get("$_baseUrl/popular?api_key=$_apiKey");
+    final response = await _client.get("$_baseUrl/popular?api_key=883f4e3915ab44847949954a07a67ac2");
     if (response.statusCode == 200) {
       return ItemModel.fromJson(json.decode(response.body));
     } else {
@@ -19,7 +18,7 @@ class MovieApiProvider {
   }
 
   Future<ItemModel> fetchTopRatedMovieList() async {
-    final response = await client.get("$_baseUrl/top_rated?api_key=$_apiKey");
+    final response = await _client.get("$_baseUrl/top_rated?api_key=883f4e3915ab44847949954a07a67ac2");
     if (response.statusCode == 200) {
       return ItemModel.fromJson(json.decode(response.body));
     } else {
@@ -29,7 +28,7 @@ class MovieApiProvider {
 
   Future<TrailerModel> fetchTrailer(int movieId) async {
     final response =
-    await client.get("$_baseUrl/$movieId/videos?api_key=$_apiKey");
+    await _client.get("$_baseUrl/$movieId/videos?api_key=883f4e3915ab44847949954a07a67ac2");
 
     if (response.statusCode == 200) {
       return TrailerModel.fromJson(json.decode(response.body));
@@ -37,5 +36,6 @@ class MovieApiProvider {
       throw Exception('Failed to load trailers');
     }
   }
+
 
 }

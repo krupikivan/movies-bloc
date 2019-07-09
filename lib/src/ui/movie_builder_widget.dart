@@ -1,26 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_movies/src/bloc/movie_detail_provider.dart';
+import 'package:flutter_movies/src/bloc/movie/movie_detail_provider.dart';
 import 'package:flutter_movies/src/model/item_model.dart';
 
 import 'movie_details.dart';
 
-class MovieBuilder extends StatefulWidget {
+class MovieBuilder extends StatelessWidget {
 
   final int index;
   final ItemModel itemModel;
 
   const MovieBuilder({Key key, this.index, this.itemModel}) : super(key: key);
-
-  @override
-  _MovieBuilderState createState() => _MovieBuilderState(index, itemModel);
-}
-
-class _MovieBuilderState extends State<MovieBuilder>{
-
-  final int index;
-  final ItemModel itemModel;
-
-  _MovieBuilderState(this.index, this.itemModel);
 
   @override
   Widget build(BuildContext context) {

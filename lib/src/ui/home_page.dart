@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_movies/src/bloc/favourite_page.dart';
+import 'package:flutter_movies/src/bloc/movie/movie_provider.dart';
 import 'package:flutter_movies/src/bloc/navbar/navbar_bloc.dart';
-import 'package:flutter_movies/src/bloc/popup_bloc.dart';
-import 'package:flutter_movies/src/bloc/popup_event.dart';
 import 'package:flutter_movies/src/model/filter.dart';
 import 'package:flutter_movies/src/ui/popular_movie_list.dart';
 
@@ -20,12 +19,6 @@ class HomePageState extends State<HomePage> {
 
   NavbarBloc _navbarBloc;
   Filter _selectedFilter = filter[0];
-  final _popupBloc = PopupBloc();
-
-  void _selectedFilterMenu(Filter filter){
-    if (filter.id == 0) _popupBloc.popupEventSink.add(PopularEvent());
-    else _popupBloc.popupEventSink.add(TopRatedEvent());
-  }
 
   @override
   void initState() {
@@ -42,6 +35,7 @@ class HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final _movieBloc = MovieProvider.of(context);
     return Scaffold(
       body: StreamBuilder<NavbarItem>(
         stream: _navbarBloc.itemStream,
@@ -50,12 +44,12 @@ class HomePageState extends State<HomePage> {
           switch (snapshot.data) {
             case NavbarItem.INICIO:
               return StreamBuilder<Filter>(
-                stream: _popupBloc.popupItem,
+                  stream: _movieBloc.outputFilters,
                 initialData: _selectedFilter,
                 builder: (context, AsyncSnapshot<Filter> snapFilter) {
                   return Scaffold(
                       appBar: AppBar(
-                        title: Text(snapFilter.data.title.data),
+                        title: Text(snapFilter.data.title),
                         actions: <Widget>[
                           new PopupMenuButton(
                               itemBuilder: (BuildContext context){
@@ -63,13 +57,16 @@ class HomePageState extends State<HomePage> {
                                   return new PopupMenuItem(
                                     value: filter,
                                     child: new ListTile(
-                                      title: filter.title,
+                                      title: Text(filter.title),
                                     ),
                                   );
                                 }).toList();
                               },
-                            onSelected: _selectedFilterMenu,
-                          )
+                            onSelected: (Filter newValue) {
+                              // _popupBloc.addFilter(newValue);
+                              _movieBloc.inputFiltes.add(newValue);
+                            },
+                          ),
                         ],
                       ),
                       body: PopularPage()

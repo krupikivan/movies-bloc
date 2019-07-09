@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_movies/src/bloc/movie_detail_bloc.dart';
-import 'package:flutter_movies/src/bloc/movie_detail_provider.dart';
-export 'package:flutter_movies/src/bloc/movie_detail_provider.dart';
+import 'package:flutter_movies/src/bloc/movie/movie_detail_bloc.dart';
+import 'package:flutter_movies/src/bloc/movie/movie_detail_provider.dart';
+export 'package:flutter_movies/src/bloc/movie/movie_detail_provider.dart';
 
 class MovieDetailProvider extends InheritedWidget {
   final MovieDetailBloc bloc;
