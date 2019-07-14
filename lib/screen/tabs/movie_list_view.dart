@@ -1,17 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_movies/bloc/bloc_provider.dart';
 import 'package:flutter_movies/bloc/favorite/favorite_bloc.dart';
+import 'package:flutter_movies/functions/global_state.dart';
 import 'package:flutter_movies/model/movie.dart';
 import 'package:flutter_movies/model/movie_list.dart';
-import 'package:flutter_movies/screen/movie_detail/details.dart';
 import 'package:flutter_movies/widget/movie_card_widget.dart';
 import 'package:flutter_movies/widget/movie_item_view_shimmer.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 
 class MovieListView extends StatelessWidget {
+
+
   final AsyncSnapshot<MovieList> listItems;
   final FavoriteBloc favoriteBloc;
-  const MovieListView({Key key, this.listItems, this.favoriteBloc}) : super(key: key);
+  MovieListView({this.listItems, this.favoriteBloc});
+
+  GlobalState _store = GlobalState.instance;
+
 
   @override
   Widget build(BuildContext context) {
@@ -66,8 +71,9 @@ class MovieListView extends StatelessWidget {
         movie: movie,
         favoritesStream: favoritesStream,
         onPressed: () {
-        Navigator.push(context, MaterialPageRoute(builder: (context){return DetailsPage(data: movie,);}));
-
+          _store.set('movie', movie);
+          Navigator.of(context).pushNamed('/movie_details');
+          //Navigator.push(context, MaterialPageRoute(builder: (context){return DetailsPage();}));
         });
   }
 }
