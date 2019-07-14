@@ -20,25 +20,36 @@ class ReviewWidget extends StatelessWidget {
         child: StreamBuilder<MovieReviews>(
             stream: _reviewsMovieBloc.outputReviews,
             builder: (BuildContext context, AsyncSnapshot<MovieReviews> snapshot) {
-              return ListView.separated(
-                scrollDirection: Axis.vertical,
-                itemCount: snapshot.data.results.length,
-                itemBuilder: (BuildContext context, int index){
-                  return ListTile(
-                    title: Text(snapshot.data.results[index].author, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20), textScaleFactor: 1.4),
-                    subtitle: Padding(
-                      padding: const EdgeInsets.only(top: 20),
-                      child: Text(snapshot.data.results[index].content, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
-                    ),
-                    dense: false,
-                    contentPadding: EdgeInsets.all(15),
-                  );
-                }, separatorBuilder: (BuildContext context, int index) {return Divider();},
-              );
+              if (snapshot.hasData)
+                return _buildReviews(context, snapshot.data);
+              else
+                return _buildLoading();
             }
         ),
       ),
     );
+  }
+
+  Widget _buildReviews(BuildContext context, MovieReviews data) {
+    return ListView.separated(
+      scrollDirection: Axis.vertical,
+      itemCount: data.results.length,
+      itemBuilder: (BuildContext context, int index){
+        return ListTile(
+          title: Text(data.results[index].author, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
+          subtitle: Padding(
+            padding: const EdgeInsets.only(top: 20),
+            child: Text(data.results[index].content, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15)),
+          ),
+          dense: false,
+          contentPadding: EdgeInsets.all(15),
+        );
+      }, separatorBuilder: (BuildContext context, int index) {return Divider();},
+    );
+  }
+
+  Widget _buildLoading() {
+    return Container(child: Text('No hay comentarios', style: TextStyle(fontSize: 40),));
   }
 }
 
