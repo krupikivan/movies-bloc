@@ -198,14 +198,10 @@ class _MovieDetailState extends State<MovieDetail> {
                   Container(margin: EdgeInsets.only(
                       top: 8.0, bottom: 8.0)),
                   Center(
-                    child: RaisedButton(
+                    child: FlatButton(
                       child: new Text('Leer comentarios'),
                       onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context){
-                          return ReviewsPage(
-                            id: widget.movie.id,
-                          );
-                        }));
+                        Navigator.push(context, MaterialPageRoute(builder: (context) => ReviewsPage(id: widget.movie.id)));
                       },
                       color: Colors.white,
                         shape: new Border.all(color: Colors.black)
