@@ -31,21 +31,9 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     final _movieBloc = MovieProvider.of(context);
-    return StreamBuilder<String>(
-        stream: _navbarBloc.titleOut,
-        initialData: _selectedFilter.title,
-        builder: (context, AsyncSnapshot<String> snapshot) {
-          return Scaffold(
-            appBar: AppBar(
-              title: Text(snapshot.data),
-              actions: <Widget>[
-                _buildPopupMenu(context, _movieBloc),
-              ],
-            ),
-            body: _buildBody(context, _movieBloc),
-            bottomNavigationBar: _buildBottomNavigationBar(context),
-          );
-        }
+    return Scaffold(
+      body: _buildBody(context, _movieBloc),
+      bottomNavigationBar: _buildBottomNavigationBar(context),
     );
   }
 
@@ -75,8 +63,8 @@ class _HomePageState extends State<HomePage> {
         }).toList();
       },
       onSelected: (Filter newValue) {
+        // _popupBloc.addFilter(newValue);
         _movieBloc.inputFiltes.add(newValue);
-        _navbarBloc.titleIn.add(newValue.title);
       },
     );
   }
@@ -86,15 +74,28 @@ class _HomePageState extends State<HomePage> {
         stream: _movieBloc.outputFilters,
         initialData: _selectedFilter,
         builder: (context, AsyncSnapshot<Filter> snapFilter) {
-          return _buildMoviesByFilter(context, _movieBloc);
+          return Scaffold(
+            appBar: AppBar(
+              title: Text(snapFilter.data.title),
+              actions: <Widget>[
+                _buildPopupMenu(context, _movieBloc),
+              ],
+            ),
+            body: _buildMoviesByFilter(context, _movieBloc),
+          );
         }
     );
   }
 
   Widget _buildFavoritos(BuildContext context) {
-    return Container(
-        padding: new EdgeInsets.all(5.0),
-        child: FavoriteListView()
+    return Scaffold(
+        appBar: AppBar(
+          title: Text("Favoritos"),
+        ),
+        body: Container(
+            padding: new EdgeInsets.all(5.0),
+            child: FavoriteListView()
+        )
     );
   }
 
@@ -141,4 +142,5 @@ class _HomePageState extends State<HomePage> {
       },
     );
   }
+
 }
