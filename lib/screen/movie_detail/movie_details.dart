@@ -6,8 +6,8 @@ import 'package:flutter_movies/bloc/favorite/favorite_movie_bloc.dart';
 import 'package:flutter_movies/bloc/movie/movie_detail_bloc.dart';
 import 'package:flutter_movies/bloc/movie/movie_detail_provider.dart';
 import 'package:flutter_movies/bloc/trailer/trailer_list_bloc_provider.dart';
+import 'package:flutter_movies/functions/global_state.dart';
 import 'package:flutter_movies/model/movie.dart';
-import 'package:flutter_movies/screen/movie_detail/reviews.dart';
 import 'package:flutter_movies/screen/movie_detail/trailer_list_screen.dart';
 import 'package:flutter_movies/widget/sliver_fab.dart';
 import 'package:smooth_star_rating/smooth_star_rating.dart';
@@ -33,6 +33,7 @@ class _MovieDetailState extends State<MovieDetail> {
   FavoriteMovieBloc _favBloc;
   StreamSubscription _subscription;
   MovieDetailBloc movieBloc;
+  GlobalState _store = GlobalState.instance;
 
   @override
   void initState() {
@@ -73,7 +74,7 @@ class _MovieDetailState extends State<MovieDetail> {
   @override
   Widget build(BuildContext context) {
     final FavoriteBloc blocFavorite = BlocProvider.of<FavoriteBloc>(context);
-     return _buildBuilder(context, blocFavorite);
+    return _buildBuilder(context, blocFavorite);
   }
 
   Widget _buildBuilder(BuildContext context, FavoriteBloc blocFavorite){
@@ -198,12 +199,14 @@ class _MovieDetailState extends State<MovieDetail> {
                   Container(margin: EdgeInsets.only(
                       top: 8.0, bottom: 8.0)),
                   Center(
-                    child: FlatButton(
-                      child: new Text('Leer comentarios'),
-                      onPressed: () {
-                        Navigator.push(context, MaterialPageRoute(builder: (context) => ReviewsPage(id: widget.movie.id)));
-                      },
-                      color: Colors.white,
+                    child: RaisedButton(
+                        child: new Text('Leer comentarios'),
+                        onPressed: () {
+                          _store.set('idMovie', widget.movie.id);
+                          Navigator.of(context).popAndPushNamed('/movie_reviews');
+                          //Navigator.push(context, new MaterialPageRoute(builder:(BuildContext context)  => new ReviewWidget()));
+                        },
+                        color: Colors.white,
                         shape: new Border.all(color: Colors.black)
                     ),
                   )
@@ -215,37 +218,37 @@ class _MovieDetailState extends State<MovieDetail> {
     );
   }
 
- Widget _buildTrailerScreen(BuildContext context) {
-   return TrailerListBlocProvider(
-     child: TrailerListScreen(
-       movieId: widget.movie.id,
-     ),
-   );
- }
+  Widget _buildTrailerScreen(BuildContext context) {
+    return TrailerListBlocProvider(
+      child: TrailerListScreen(
+        movieId: widget.movie.id,
+      ),
+    );
+  }
 
 
   Widget _favButton(BuildContext context, FavoriteBloc blocFavorite) {
-   return StreamBuilder<bool>(
-     stream: _favBloc.outIsFavorite,
-       initialData: false,
-     builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
-       return new FloatingActionButton(
-          backgroundColor: Colors.white,
-          child: Icon(
-            snapshot.data
-                ? Icons.favorite
-                : Icons.favorite_border,
-            color: snapshot.data ? Colors.red : Colors.grey, size: 35,
-          ),
-          onPressed: () {
-            if (snapshot.data) {
-              blocFavorite.inRemoveFavorite.add(widget.movie);
-            } else {
-              blocFavorite.inAddFavorite.add(widget.movie);
-            }
+    return StreamBuilder<bool>(
+        stream: _favBloc.outIsFavorite,
+        initialData: false,
+        builder: (BuildContext context, AsyncSnapshot<bool> snapshot) {
+          return new FloatingActionButton(
+            backgroundColor: Colors.white,
+            child: Icon(
+              snapshot.data
+                  ? Icons.favorite
+                  : Icons.favorite_border,
+              color: snapshot.data ? Colors.red : Colors.grey, size: 35,
+            ),
+            onPressed: () {
+              if (snapshot.data) {
+                blocFavorite.inRemoveFavorite.add(widget.movie);
+              } else {
+                blocFavorite.inAddFavorite.add(widget.movie);
+              }
             },
-        );
-     }
-   );
+          );
+        }
+    );
   }
 }

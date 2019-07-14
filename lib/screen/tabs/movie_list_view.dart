@@ -66,11 +66,8 @@ class MovieListView extends StatelessWidget {
         movie: movie,
         favoritesStream: favoritesStream,
         onPressed: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context){
-            return DetailsPage(
-              data: movie,
-            );
-          }));
+        Navigator.push(context, MaterialPageRoute(builder: (context){return DetailsPage(data: movie,);}));
+
         });
   }
 }
