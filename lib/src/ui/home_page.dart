@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_movies/src/bloc/favourite_page.dart';
+import 'package:flutter_movies/src/ui/favorite_page.dart';
 import 'package:flutter_movies/src/bloc/movie/movie_provider.dart';
 import 'package:flutter_movies/src/bloc/navbar/navbar_bloc.dart';
 import 'package:flutter_movies/src/model/filter.dart';
-import 'package:flutter_movies/src/ui/popular_movie_list.dart';
+import 'package:flutter_movies/src/ui/movie_page.dart';
 
 
 
@@ -52,25 +52,10 @@ class HomePageState extends State<HomePage> {
                       appBar: AppBar(
                         title: Text(snapFilter.data.title),
                         actions: <Widget>[
-                          new PopupMenuButton(
-                              itemBuilder: (BuildContext context){
-                                return filter.map((Filter filter){
-                                  return new PopupMenuItem(
-                                    value: filter,
-                                    child: new ListTile(
-                                      title: Text(filter.title),
-                                    ),
-                                  );
-                                }).toList();
-                              },
-                            onSelected: (Filter newValue) {
-                              // _popupBloc.addFilter(newValue);
-                              _movieBloc.inputFiltes.add(newValue);
-                            },
-                          ),
+                          _buildPopupMenu(context, _movieBloc),
                         ],
                       ),
-                      body: PopularPage()
+                      body: MoviePage()
                   );
                 }
               );
@@ -79,7 +64,7 @@ class HomePageState extends State<HomePage> {
                   appBar: AppBar(
                     title: Text("Favoritos"),
                   ),
-                  body: FavouritePage()
+                  body: FavoritePage()
               );
           }
         },
@@ -110,6 +95,25 @@ class HomePageState extends State<HomePage> {
         title: Text("Favoritos"),
       ),
     ];
+  }
+
+  Widget _buildPopupMenu(BuildContext context, _movieBloc) {
+    return PopupMenuButton(
+      itemBuilder: (BuildContext context){
+        return filter.map((Filter filter){
+          return new PopupMenuItem(
+            value: filter,
+            child: new ListTile(
+              title: Text(filter.title),
+            ),
+          );
+        }).toList();
+      },
+      onSelected: (Filter newValue) {
+        // _popupBloc.addFilter(newValue);
+        _movieBloc.inputFiltes.add(newValue);
+      },
+    );
   }
 }
 

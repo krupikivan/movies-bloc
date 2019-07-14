@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_movies/src/bloc/favorite/favorite_provider.dart';
 import 'package:flutter_movies/src/bloc/movie/movie_detail_provider.dart';
 import 'package:flutter_movies/src/model/item_model.dart';
 
@@ -8,16 +9,38 @@ class MovieBuilder extends StatelessWidget {
 
   final int index;
   final ItemModel itemModel;
-
   const MovieBuilder({Key key, this.index, this.itemModel}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    return _buildMovieEachItems(context);
+  }
+
+  openDetailPage(ItemModel data, int index, BuildContext context) {
+    final page = MovieDetailProvider(
+      child: MovieDetail(
+        title: data.results[index].title,
+        posterUrl: data.results[index].poster_path,
+        description: data.results[index].overview,
+        releaseDate: data.results[index].release_date,
+        voteAverage: data.results[index].vote_average.toString(),
+        movieId: data.results[index].id,
+        backdropPath: data.results[index].backdrop_path,
+      ),
+    );
+    Navigator.push(context,
+      MaterialPageRoute(builder: (context) {
+        return page;
+      }),
+    );
+  }
+
+  Widget _buildMovieEachItems(BuildContext context) {
     return Container(
       padding: new EdgeInsets.all(5.0),
       child: Column(
         children: <Widget>[
-      index != -1?
+          index != -1?
           InkWell(
             enableFeedback: true,
             onTap: () => openDetailPage(itemModel, index, context),
@@ -41,29 +64,9 @@ class MovieBuilder extends StatelessWidget {
               ],
             ),
           )
-          : Expanded(child: Container(color: Colors.grey,)),
+              : Expanded(child: Container(color: Colors.grey,)),
         ],
       ),
-      //margin: EdgeInsets.symmetric(vertical: 10.0, horizontal: 5.0),
-      //decoration: BoxDecoration(borderRadius: BorderRadius.circular(10.0)),
-    );
-  }
-
-  openDetailPage(ItemModel data, int index, BuildContext context) {
-    final page = MovieDetailProvider(
-      child: MovieDetail(
-        title: data.results[index].title,
-        posterUrl: data.results[index].backdrop_path,
-        description: data.results[index].overview,
-        releaseDate: data.results[index].release_date,
-        voteAverage: data.results[index].vote_average.toString(),
-        movieId: data.results[index].id,
-      ),
-    );
-    Navigator.push(context,
-      MaterialPageRoute(builder: (context) {
-        return page;
-      }),
     );
   }
 }

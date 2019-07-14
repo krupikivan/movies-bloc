@@ -1,12 +1,19 @@
 import 'dart:async';
-
+import 'package:flutter_movies/src/bloc/favorite/favorite_bloc.dart';
+import 'package:flutter_movies/src/bloc/favorite/favorite_movie_bloc.dart';
+import 'package:flutter_movies/src/bloc/favorite/favorite_provider.dart';
+import 'package:flutter_movies/src/bloc/movie/trailer_list_bloc_provider.dart';
+import 'package:flutter_movies/src/model/movie.dart';
+import 'package:flutter_movies/src/ui/sliver_fab.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_movies/src/bloc/movie/movie_detail_bloc.dart';
 import 'package:flutter_movies/src/bloc/movie/movie_detail_provider.dart';
 import 'package:flutter_movies/src/model/trailer_model.dart';
+import 'package:flutter_movies/src/ui/trailer_list_screen.dart';
 
 class MovieDetail extends StatefulWidget {
   final posterUrl;
+  final backdropPath;
   final description;
   final releaseDate;
   final String title;
@@ -20,6 +27,7 @@ class MovieDetail extends StatefulWidget {
     this.releaseDate,
     this.voteAverage,
     this.movieId,
+    this.backdropPath,
   });
 
   @override
@@ -31,12 +39,14 @@ class MovieDetail extends StatefulWidget {
       releaseDate: releaseDate,
       voteAverage: voteAverage,
       movieId: movieId,
+      backdropPath: backdropPath,
     );
   }
 }
 
 class MovieDetailState extends State<MovieDetail> {
   final posterUrl;
+  final backdropPath;
   final description;
   final releaseDate;
   final String title;
@@ -44,21 +54,23 @@ class MovieDetailState extends State<MovieDetail> {
   final int movieId;
 
   MovieDetailBloc bloc;
-
+  FavoriteBloc favoriteBloc;
   MovieDetailState({
     this.title,
     this.posterUrl,
+    this.backdropPath,
     this.description,
     this.releaseDate,
     this.voteAverage,
     this.movieId,
   });
+  bool _isFavorite = false;
 
   @override
   void didChangeDependencies() {
     bloc = MovieDetailProvider.of(context);
     bloc.fetchTrailersById(movieId);
-    print("recreated");
+    favoriteBloc = FavoriteProvider.of(context);
     super.didChangeDependencies();
   }
 
@@ -70,115 +82,14 @@ class MovieDetailState extends State<MovieDetail> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        top: false,
-        bottom: false,
-        child: NestedScrollView(
-            headerSliverBuilder:
-                (BuildContext context, bool innerBoxIsScrolled) {
-              return <Widget>[
-                SliverAppBar(
-                  expandedHeight: 250.0,
-                  floating: false,
-                  pinned: true,
-                  elevation: 0.0,
-                  flexibleSpace: FlexibleSpaceBar(
-                      centerTitle: false,
-                      title: Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                      background: Image.network(
-                        "https://image.tmdb.org/t/p/w500$posterUrl",
-                        fit: BoxFit.cover,
-                      )),
-                ),
-              ];
-            },
-            body: ListView(
-              children: <Widget>[
-                Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Container(margin: EdgeInsets.only(top: 5.0)),
-                      Text(
-                        title,
-                        style: TextStyle(
-                          fontSize: 25.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
-                      Row(
-                        children: <Widget>[
-                          Icon(
-                            Icons.favorite,
-                            color: Colors.red,
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(left: 1.0, right: 1.0),
-                          ),
-                          Text(
-                            voteAverage,
-                            style: TextStyle(
-                              fontSize: 18.0,
-                            ),
-                          ),
-                          Container(
-                            margin: EdgeInsets.only(left: 10.0, right: 10.0),
-                          ),
-                          Text(
-                            releaseDate,
-                            style: TextStyle(
-                              fontSize: 18.0,
-                            ),
-                          ),
-                        ],
-                      ),
-                      Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
-                      Text(description),
-                      Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
-                      Text(
-                        "Trailer",
-                        style: TextStyle(
-                          fontSize: 25.0,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Container(margin: EdgeInsets.only(top: 8.0, bottom: 8.0)),
-                      StreamBuilder(
-                        stream: bloc.movieTrailers,
-                        builder: (context,
-                            AsyncSnapshot<Future<TrailerModel>> snapshot) {
-                          if (snapshot.hasData) {
-                            return FutureBuilder(
-                              future: snapshot.data,
-                              builder: (context,
-                                  AsyncSnapshot<TrailerModel> itemSnapShot) {
-                                if (itemSnapShot.hasData) {
-                                  if (itemSnapShot.data.results.length > 0)
-                                    return trailerLayout(itemSnapShot.data);
-                                  else
-                                    return noTrailer(itemSnapShot.data);
-                                } else {
-                                  return Center(
-                                      child: CircularProgressIndicator());
-                                }
-                              },
-                            );
-                          } else {
-                            return Center(child: CircularProgressIndicator());
-                          }
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            )),
+    return new Scaffold(
+      body: new Builder(
+        builder: (context) =>
+            _builContainer(context, favoriteBloc),
       ),
     );
   }
+
 
   Widget noTrailer(TrailerModel data) {
     return Center(
@@ -190,37 +101,203 @@ class MovieDetailState extends State<MovieDetail> {
 
   Widget trailerLayout(TrailerModel data) {
     if (data.results.length > 1) {
-      return Row(
+      return Column(
         children: <Widget>[
+
           trailerItem(data, 0),
-          trailerItem(data, 1),
+
         ],
       );
+
     } else {
-      return Row(
-        children: <Widget>[
-          trailerItem(data, 0),
-        ],
+      return Expanded(
+        child: Column(
+          children: <Widget>[
+            trailerItem(data, 0),
+          ],
+        ),
       );
     }
   }
 
-  trailerItem(TrailerModel data, int index) {
-    return Expanded(
-      child: Column(
-        children: <Widget>[
-          Container(
-            margin: EdgeInsets.all(5.0),
-            height: 100.0,
-            color: Colors.grey,
-            child: Center(child: Icon(Icons.play_circle_filled)),
-          ),
-          Text(
-            data.results[index].name,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+  Widget trailerItem(TrailerModel data, int index) {
+    return Column(
+      children: <Widget>[
+        Container(
+          margin: EdgeInsets.all(5.0),
+          height: 100.0,
+          color: Colors.grey,
+          child: Center(child: Icon(Icons.play_circle_outline, color: Colors.white)),
+        ),
+        Text(
+          data.results[index].name,
+          maxLines: 1,
+          overflow: TextOverflow.ellipsis,
+        ),
+      ],
+    );
+  }
+
+  Widget _buildAppBar(BuildContext context) {
+    return SliverAppBar(
+      expandedHeight: 250.0,
+      floating: false,
+      pinned: true,
+      elevation: 0.0,
+      flexibleSpace: FlexibleSpaceBar(
+          centerTitle: false,
+          title: Text(title,
+              style: TextStyle(
+                  fontSize: 18, fontWeight: FontWeight.bold)),
+          background: Image.network(
+            "https://image.tmdb.org/t/p/w500$backdropPath",
+            fit: BoxFit.cover,
+          )),
+    );
+  }
+
+  Widget _buildList(BuildContext context) {
+    return SliverList(
+      delegate: new SliverChildListDelegate(
+          [
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Container(
+                    child: Row(
+                      children: <Widget>[
+                        Container(
+                          width: 150.0,
+                          height: 200.0,
+                          decoration: BoxDecoration(
+                              shape: BoxShape.rectangle,
+                              borderRadius: BorderRadius.all(
+                                  Radius.circular(15.0)
+                              ),
+                              image: new DecorationImage(
+                                  fit: BoxFit.fill,
+                                  image: NetworkImage(
+                                      "https://image.tmdb.org/t/p/w500$posterUrl"
+                                  )
+                              )
+                          ),
+                        ),
+                        Container(margin: EdgeInsets.only(
+                            left: 25.0)),
+                        Column(
+                          children: <Widget>[
+                            Text('User Rating',
+                              style: TextStyle(fontSize: 18,
+                                  fontWeight: FontWeight
+                                      .bold),),
+                            Text(
+                              voteAverage,
+                              style: TextStyle(
+                                fontSize: 18.0,
+                              ),
+                            ),
+                            Text('Release date',
+                              style: TextStyle(fontSize: 18,
+                                  fontWeight: FontWeight
+                                      .bold),),
+                            Text(
+                              releaseDate,
+                              style: TextStyle(
+                                fontSize: 18.0,
+                              ),
+                            ),
+                          ],
+                        )
+                      ],
+                    ),
+                  ),
+                  Container(margin: EdgeInsets.only(
+                      top: 8.0, bottom: 8.0)),
+                  Text(
+                    description, textAlign: TextAlign.center,),
+                  Container(margin: EdgeInsets.only(
+                      top: 8.0, bottom: 8.0)),
+                  Text(
+                    "Trailer",
+                    style: TextStyle(
+                      fontSize: 25.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  Container(margin: EdgeInsets.only(
+                      top: 8.0, bottom: 8.0)),
+                  _buildTrailerScreen(context),
+                ],
+              ),
+            ),
+          ]
+      ),
+    );
+  }
+
+  Widget _builContainer(BuildContext context, FavoriteBloc _favoriteBloc) {
+    return SliverContainer(
+      floatingActionButton: new FloatingActionButton(
+        backgroundColor: Colors.white,
+        child: StreamBuilder<List<Movie>>(
+          stream: _favoriteBloc.outputMovies,
+          builder: (BuildContext context,
+              AsyncSnapshot<List<Movie>> snapshot) {
+            return Positioned(
+              top: 16.0,
+              right: 16.0,
+              child: InkWell(
+                onTap: () {
+                  for(var i = 0; i < snapshot.data.length; i++){
+                    if (snapshot.data[i].id == movieId) {
+                      _favoriteBloc.inRemoveFavorite.add(
+                        Movie(movieId, voteAverage, title, backdropPath, description, releaseDate),
+                      );
+                      return;
+                    } else {
+                      _favoriteBloc.inAddFavorite.add(
+                        Movie(movieId, voteAverage, title, backdropPath, description, releaseDate),
+                      );
+                      setState(() {
+                      _isFavorite = true;
+                      });
+                      return;
+                    }
+                  }
+                },
+                child: Container(
+                    decoration: BoxDecoration(
+                      color: Colors.black54,
+                      borderRadius: BorderRadius.circular(50.0),
+                    ),
+                    padding: const EdgeInsets.all(4.0),
+                    child: Icon(
+                      _isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: _isFavorite ? Colors.red : Colors.white,
+                    )),
+              ),
+            );
+          },
+        ),
+
+        onPressed: () => {},
+      ),
+      expandedHeight: 256.0,
+      slivers: <Widget>[
+        _buildAppBar(context),
+        _buildList(context),
+      ],
+    );
+  }
+
+  Widget _buildTrailerScreen(BuildContext context) {
+    return TrailerListBlocProvider(
+      child: TrailerListScreen(
+        movieId: movieId,
       ),
     );
   }

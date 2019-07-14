@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_movies/src/bloc/movie/movie_bloc.dart';
+import 'package:flutter_movies/bloc/movie/movie_bloc.dart';
 
 class MovieProvider extends InheritedWidget {
   final bloc = MovieBloc();
