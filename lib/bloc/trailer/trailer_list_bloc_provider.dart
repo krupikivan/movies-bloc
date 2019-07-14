@@ -1,6 +1,5 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter_movies/src/bloc/movie/trailer_list_bloc.dart';
+import 'package:flutter_movies/bloc/trailer/trailer_list_bloc.dart';
 
 class TrailerListBlocProvider extends InheritedWidget {
   final TrailerListBloc bloc;
@@ -16,7 +15,7 @@ class TrailerListBlocProvider extends InheritedWidget {
 
   static TrailerListBloc of(BuildContext context) {
     return (context.inheritFromWidgetOfExactType(TrailerListBlocProvider)
-            as TrailerListBlocProvider)
+    as TrailerListBlocProvider)
         .bloc;
   }
 }

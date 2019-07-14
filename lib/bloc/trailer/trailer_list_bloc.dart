@@ -1,13 +1,11 @@
-
-import 'package:flutter_movies/src/model/trailer_list.dart';
-import 'package:flutter_movies/src/repo/movie_api_provider.dart';
+import 'package:flutter_movies/api/repository.dart';
+import 'package:flutter_movies/model/trailer_list.dart';
 import 'package:rxdart/rxdart.dart';
 
 class TrailerListBloc {
+  final repository = Repository();
   final _fetchMovieTrailers = PublishSubject<TrailerList>();
-  final repository = MovieApiProvider();
   Observable<TrailerList> get movieTrailersStream => _fetchMovieTrailers.stream;
-
 
   void dispose() async {
     await _fetchMovieTrailers.drain();

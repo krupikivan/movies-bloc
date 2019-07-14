@@ -1,5 +1,4 @@
-import 'package:flutter_movies/src/model/trailer.dart';
-
+import 'package:flutter_movies/model/trailer.dart';
 
 class TrailerList {
   int id;
