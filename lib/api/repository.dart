@@ -1,11 +1,11 @@
 import 'dart:async';
 
-import 'package:flutter_movies_bloc/api/api_provider.dart';
-import 'package:flutter_movies_bloc/cons/moviedb.dart';
-import 'package:flutter_movies_bloc/model/movie.dart';
-import 'package:flutter_movies_bloc/model/movie_list.dart';
-import 'package:flutter_movies_bloc/model/movie_reviews.dart';
-import 'package:flutter_movies_bloc/model/trailer_list.dart';
+import 'package:flutter_movies/api/api_provider.dart';
+import 'package:flutter_movies/cons/moviedb.dart';
+import 'package:flutter_movies/model/movie.dart';
+import 'package:flutter_movies/model/movie_list.dart';
+import 'package:flutter_movies/model/movie_reviews.dart';
+import 'package:flutter_movies/model/trailer_list.dart';
 
 class Repository {
   final apiProvider = ApiProvider();
